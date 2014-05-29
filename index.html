@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+
+<html>
+<head>
+    <title>Q Generator</title>
+</head>
+
+<body>
+    <style>
+        body {
+            font-family: Verdana;
+            font-size: 11px;
+            
+        }
+        
+        #q_generator {
+            width:200px;
+            height:200px;
+            display: inline-block;
+            border: 1px solid red;
+            margin: 0px;
+            padding: 0px;
+            overflow: hidden;
+            float: left;
+        }
+        .q_item {
+            display:inline-block;
+            width: 4%;
+            height:4%;
+            border:1px solid pink;
+            margin: 0px;
+            padding: 0px;
+            float: left;
+        }
+        
+        #q_result {
+            width:400px;
+            height:200px;
+            display: inline-block;
+            float: left;
+    -ms-word-break: break-all;
+    word-break: break-all;
+
+ /* Non standard for webkit */
+     word-break: break-word;
+
+    -webkit-hyphens: auto;
+       -moz-hyphens: auto;
+        -ms-hyphens: auto;
+            hyphens: auto;
+            overflow: auto;
+        }
+        
+        #console {
+            display: block;
+            float: right;
+            width: 200px;
+        }
+    </style>
+    <h1>Gkiokan.NET</h1>
+    <h3>q-Generator</h3>
+    <div class='container'>
+        <input type='text' name='code' id='code' value=''> Code<br>
+        <input type='range' name='css' id='css' min=1 max=4 value=4> DPI of Generator <br>
+        <input type='text' name='size' id='size' value='200'> Size of Generator <br>
+        <button id='push'>Re-Generate generator</button><br>
+        <button id='decrypt'>Decrypt my Code</button>
+        <br>
+        <br>
+        <div id='q_generator'></div>
+        <div id='q_result'></div>
+        <div id='console'></div>
+    </div>
+    
+    <script src='http://code.jquery.com/jquery-1.11.0.min.js'></script>
+    <script>
+    $( document ).ready(function() {
+        // Initialise
+        console.log( "Gkiokan.NET - notice system \nq-Generator started\n" );
+        console.log( "\n-jQuery loaded" );
+        
+        // Configuration
+        var code = $('#code');
+        var res  = $('#q_result');
+        var size = $('#size').val();
+        var css  = $('#css').val();
+        var dpi  = size*2;
+        var push = $('#push');
+        
+        // ReBuild Button
+        $('#push').on('click', function(){
+            var new_code = $('#code').val();
+            //var new_dpi  = $('#dpi').val();
+            var new_size = $('#size').val();
+            var new_css  = $('#css').val();
+            var new_dpi  = new_size*2;
+            
+            //$('#console').append("Settings Refresh: Size of Generator "+new_size+" | q_Items "+new_dpi+" | dpi "+new_css+"<br>");
+            $('#q_generator').html('');
+            
+            build_all(new_size, new_css);
+        });
+        
+        // Decrpyt Button
+        $('#decrypt').on('click', function(){
+            var final_code = $('#code').val();
+            alert('This is your Source Code to get Decrypted... \n\n'+final_code);
+            console.log('-Final Code finished.\n'+final_code);
+        });
+        
+        // Range slider
+        $('#css').on('change', function(){
+            var changed_css = $('#css').val();
+            var changed_size = $('#size').val();
+            
+            $('#q_generator').html('');
+            build_all(changed_size, changed_css);
+            
+            //build_q_items(changed_size);
+            //set_dpi(changed_size, changed_css);
+        });
+        
+        // malen
+        $('#q_generator').on('mouseenter', '.q_item', function(){
+            $(this).css('background','#2af');
+            var this_id = $(this).attr('data-src');
+            var old_code = $('#code').val();
+            console.log('-push id '+this_id+'\n');
+            
+            var result_code = old_code+this_id;
+            code.val(result_code);
+            res.html(result_code);
+            var new_scroll = res.height();
+            res.scrollTop(new_scroll);
+        });
+        
+        // Re Print q_generator
+        function resize_q_generator(size) {
+            $('#q_generator').css('width',size);
+            $('#q_generator').css('height', size);
+            console.log('-q-Generator resized'+size+'\n');
+        }
+    
+        // Print Div Codes
+        function build_q_items(size, css) {
+            var new_size, step1, step2, step3;
+            step1 = size/100*css;
+            step2 = size/step1;
+            new_size = step2*step2;
+            
+            for(var i=0; i<new_size; i++){
+                $('#q_generator').append("<div id='code_id_"+i+"' data-src='"+i+"' class='q_item'>&nbsp;</div>");
+            }
+            //set_dpi(fpx);            
+            console.log('-q-Generator '+size+' '+new_size+' '+css+'\n');
+            $('#console').append(new_size+' new q-Items has been build<br>');
+        }
+        
+        // Set size 
+        function set_dpi(size, css){
+            var px;
+            var fpx;
+            /*
+            if (dpi==4) { size = size*2; px = size/100*4;}
+            if (dpi==3) { size = size*3; px = size/100*3;}
+            if (dpi==2) { size = size*4; px = size/100*2;}
+            if (dpi==1) { size = size*5; px = size/100*1;}
+            */
+            fpx = size/100*css;
+            //fpx = size/px;
+            
+            $('.q_item').css('width', fpx+'px');
+            $('.q_item').css('height', fpx+'px');
+            console.log('-Change DPI size '+size+' | px '+fpx);
+        }
+        
+        function build_all(size, css) {
+            resize_q_generator(size);
+            build_q_items(size, css);
+            set_dpi(size, css);
+            //$('#console').append("Settings Refresh: Size of Generator "+size+" | q_Items "+dpi+" | dpi "+css+"<br>");
+        }
+        
+        build_all(size, css);
+    });
+    </script>
+
+</body>
+</html>
