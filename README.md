@@ -1,4 +1,4 @@
-This is my first Readme file.
+<h1>This is my first Readme file.</h1>
 
 Q_Generator is a little Javascript,
 which creates a div container where you'll be able
