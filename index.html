@@ -17,38 +17,44 @@
             width:200px;
             height:200px;
             display: inline-block;
-            border: 1px solid red;
-            margin: 0px;
+            border: 0px solid red;
+            margin: 0px 20px;
             padding: 0px;
             overflow: hidden;
-            float: left;
+            /* float: left; */
+			box-shadow:0px 0px 5px;
+			-webkit-box-shadow:0px 0px 5px;
+			-moz-box-shadow:0px 0px 5px;
         }
         .q_item {
             display:inline-block;
             width: 4%;
             height:4%;
-            border:1px solid pink;
+            border:0px solid pink;
             margin: 0px;
             padding: 0px;
             float: left;
+			border-radius:50%;
+			-webkit-border-radius:50%;
+			-moz-border-radius:50%;
         }
         
         #q_result {
             width:400px;
             height:200px;
             display: inline-block;
-            float: left;
-    -ms-word-break: break-all;
-    word-break: break-all;
-
- /* Non standard for webkit */
-     word-break: break-word;
-
-    -webkit-hyphens: auto;
-       -moz-hyphens: auto;
-        -ms-hyphens: auto;
-            hyphens: auto;
-            overflow: auto;
+		    /*float: left;*/
+	    -ms-word-break: break-all;
+	    word-break: break-all;
+	
+	 /* Non standard for webkit */
+	     word-break: break-word;
+	
+	    -webkit-hyphens: auto;
+	       -moz-hyphens: auto;
+		-ms-hyphens: auto;
+		    hyphens: auto;
+		    overflow: auto;
         }
         
         #console {
@@ -56,22 +62,73 @@
             float: right;
             width: 200px;
         }
+	
+	input, button {
+	    width: 250px;	    
+	}
     </style>
     <h1>Gkiokan.NET</h1>
     <h3>q-Generator</h3>
     <div class='container'>
         <input type='text' name='code' id='code' value=''> Code<br>
-        <input type='range' name='css' id='css' min=1 max=4 value=4> DPI of Generator <br>
+        <input type='range' name='css' id='css' min=1 max=20 value=4> DPI of Generator <br>
         <input type='text' name='size' id='size' value='200'> Size of Generator <br>
-        <button id='push'>Re-Generate generator</button><br>
-        <button id='decrypt'>Decrypt my Code</button>
+        <button id='push'>re-Generate Generator</button><br>
+        <button id='decrypt'>Decrypt my Code</button><br>
+	<button id='reset'>reset my Vektor & ID</button>
         <br>
         <br>
         <div id='q_generator'></div>
         <div id='q_result'></div>
         <div id='console'></div>
     </div>
+	
+	<br><br>	
+	<div class='updates'>
+	<h3>What is the q_Generator?</h3>
+	The q-Generator is a Unique ID Generator from your printed Vektor.<br>
+	<br>
+	<h3>How to use it?</h3>
+	Just drag your mouse into the Vektor field and prin your way and you'll <br>
+	see the code will start to deploy an ID for you.<br>
+	The first code you'll see is the source ID, <br>
+	which will be the key to get a generated Unique ID from.<br>
+	<br>
+	When you're done, you may press Decrypt my code to get your ID hashed.<br>
+	For now you can use md5, but i'm gonna add some more hash methods for sure <br>
+	or use your own hash method from JS.<br>
+	<br>
+	<h3>ToDo's</h3>
+	The Unique ID Generator isn't finished yet at all, but you can get your<br>
+	ID codes already, and there will be a Binary ID also as a ANSI key at last.<br>
+	I'll also work out the Configuration also. <br>
+	It meight be released as JS Plugins for any use of web / app.<br>
+	<br>
+	<br>
+	
+	<h3>Last Updates</h3>
+	<b>Update 31.03.2014 </b><br>
+	- MD5 hash method added<br>
+	- little CSS<br>
+	- Code Field show's finished md5 <br>
+	
+	<br>
+	<b>Update 27.03.2014 </b><br>
+	- extended DPI function 1-20 <br>
+	- q-item Design refined<br>
+	- added Update point<br>
+	- reset button <br>
+	<br>
+	<b>Prototype Build release 25.03.2014 </b><br>
+	- quick finish of the functionaly q_generator v.0.1<br>
+	- Settings: DPI 1-4, Q-Result, Q-Size<br>
+	- onScreen Debug<br>
+	<br>
+	</div>
+	<br>
+	## EOF ##
     
+    <script src='md5.js'></script>
     <script src='http://code.jquery.com/jquery-1.11.0.min.js'></script>
     <script>
     $( document ).ready(function() {
@@ -87,6 +144,14 @@
         var dpi  = size*2;
         var push = $('#push');
         
+	// Reset Button
+	$('#reset').on('click', function(){
+		$('#q_result').html('');
+		$('#code').val('');
+		$('#push').click();
+		return false;
+	});
+		
         // ReBuild Button
         $('#push').on('click', function(){
             var new_code = $('#code').val();
@@ -96,14 +161,17 @@
             var new_dpi  = new_size*2;
             
             //$('#console').append("Settings Refresh: Size of Generator "+new_size+" | q_Items "+new_dpi+" | dpi "+new_css+"<br>");
-            $('#q_generator').html('');
+            $('#q_generator, #q_result').html('');			
             
             build_all(new_size, new_css);
         });
         
         // Decrpyt Button
         $('#decrypt').on('click', function(){
-            var final_code = $('#code').val();
+            //var final_code = $('#code').val();
+	    var final_code = $('#q_result').html();
+	    var final_code = MD5(final_code);
+	    code.val(final_code);
             alert('This is your Source Code to get Decrypted... \n\n'+final_code);
             console.log('-Final Code finished.\n'+final_code);
         });
@@ -124,11 +192,11 @@
         $('#q_generator').on('mouseenter', '.q_item', function(){
             $(this).css('background','#2af');
             var this_id = $(this).attr('data-src');
-            var old_code = $('#code').val();
+            var old_code = $('#q_result').html();
             console.log('-push id '+this_id+'\n');
             
             var result_code = old_code+this_id;
-            code.val(result_code);
+            //code.val(result_code);
             res.html(result_code);
             var new_scroll = res.height();
             res.scrollTop(new_scroll);
